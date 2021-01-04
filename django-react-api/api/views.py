@@ -1,14 +1,18 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, mixins
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.contrib.auth.models import User
+from rest_framework.viewsets import GenericViewSet
+
 from api.models import Movie, Rating, Reviews, ReviewLikes
 from api.serializers import MovieSerializer, RatingSerializer, UserSerializer, ReviewsSerializer
 
 
-class UserViewSet(viewsets.ModelViewSet):
+class UserViewSet(mixins.CreateModelMixin, GenericViewSet):
+    permission_classes = [AllowAny]
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
@@ -60,6 +64,16 @@ class RatingViewSet(viewsets.ModelViewSet):
 class MovieReviewViewSet(viewsets.ModelViewSet):
     queryset = Reviews.objects.all()
     serializer_class = ReviewsSerializer
+
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        data["user"] = request.user.id
+        data["movie"] = kwargs.get("movie_id")
+        review = ReviewsSerializer(data=data)
+        if review.is_valid():
+            review.save()
+            return Response(review.data, status=status.HTTP_200_OK)
+        return Response(review.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ReviewLikeViewSet(viewsets.ViewSet):

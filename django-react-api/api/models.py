@@ -4,12 +4,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator, MinValueValidator
 
-
-class UUIDMixin(models.Model):
-    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
-
-    class Meta:
-        abstract = True
+from movierater.mixin import UUIDMixin
 
 
 class Movie(UUIDMixin):
