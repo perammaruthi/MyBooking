@@ -57,10 +57,6 @@ class Transport(UUIDMixin):
     is_available = models.BooleanField(default=True)
     start_time = models.TimeField()
     end_time = models.TimeField()
-    available_days = ArrayField(
-        models.CharField(choices=WorkingDays, max_length=10),
-        default=["Mon", "Tue", "Wed", "Thurs", "Fri", "Sat", "Sun"]
-    )
     bus_type = models.CharField(max_length=2, choices=BUS_TYPES)
     seat_pattern = models.CharField(max_length=50, choices=SEATING_PATTERNS)
     capacity = models.IntegerField(default=0)
